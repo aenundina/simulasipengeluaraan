@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulasi Pengeluaran Mahasiswa</title>
+    <meta name="description"
+        content="Website simulasi pengeluaran bulanan mahasiswa untuk membantu mengelola keuangan dengan cerdas.">
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Outfit:wght@100..900&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <div id="loginScreen" class="login-container">
+        <div class="login-card">
+            <header class="login-header">
+                <div class="logo">📊</div>
+                <h1>Selamat Datang</h1>
+                <p>Kelola keuangan pribadimu dengan lebih cerdas dan terencana.</p>
+            </header>
+            <div class="login-form">
+                <div class="input-group">
+                    <label for="userName">Siapa namamu?</label>
+                    <input type="text" id="userName" placeholder="Masukkan nama..." autocomplete="off">
+                </div>
+                <button id="loginBtn" class="primary-btn full-width">Mulai Sekarang</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="dashboard" class="dashboard-container hidden">
+        <header class="app-header">
+            <div class="header-content">
+                <h1 id="userGreeting">Halo!</h1>
+                <p>Mulai simulasikan dan kelola dana pribadimu hari ini.</p>
+            </div>
+            <div class="header-actions">
+                <button id="logoutBtn" class="ghost-btn-sm">Keluar / Ganti Nama</button>
+            </div>
+        </header>
+
+        <!-- Step Indicator -->
+        <div class="step-indicator">
+            <div class="step active" id="dot-1"><span>1</span>Pemasukan</div>
+            <div class="line"></div>
+            <div class="step" id="dot-2"><span>2</span>Target</div>
+            <div class="line"></div>
+            <div class="step" id="dot-3"><span>3</span>Belanja</div>
+            <div class="line"></div>
+            <div class="step" id="dot-4"><span>4</span>Hasil</div>
+            <div class="line"></div>
+            <div class="step" id="dot-5"><span>5</span>Analisis</div>
+        </div>
+
+        <main>
+            <!-- Step 1: Pemasukan -->
+            <section id="step-1" class="form-step active">
+                <div class="card">
+                    <h3>Atur Pemasukan</h3>
+                    <div class="input-grid">
+                        <div class="input-group">
+                            <label for="income">Total Pemasukan (Rp)</label>
+                            <input type="number" id="income" placeholder="Contoh: 5000000">
+                        </div>
+                        <div class="input-group">
+                            <label for="incomePeriod">Periode Pemasukan</label>
+                            <select id="incomePeriod">
+                                <option value="Bulanan">Bulanan</option>
+                                <option value="Mingguan">Mingguan</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="actions center">
+                    <button id="toStep2" class="primary-btn">Lanjut: Atur Target Tabungan</button>
+                </div>
+            </section>
+
+            <!-- Step 2: Target Menabung -->
+            <section id="step-2" class="form-step">
+                <div class="card">
+                    <h3>Target Menabung</h3>
+                    <div class="input-grid">
+                        <div class="input-group full-width" style="grid-column: span 2;">
+                            <label for="savingsGoal">Apa tujuan tabunganmu? (Teks Bebas)</label>
+                            <input type="text" id="savingsGoal"
+                                placeholder="Contoh: Beli Laptop Baru, Liburan, Dana Darurat">
+                        </div>
+                        <div class="input-group">
+                            <label for="savingsTarget">Berapa target nominalnya? (Rp)</label>
+                            <input type="number" id="savingsTarget" placeholder="Contoh: 5000000">
+                        </div>
+                        <div class="input-group">
+                            <label for="targetDate">Hingga tanggal berapa?</label>
+                            <input type="date" id="targetDate">
+                        </div>
+                    </div>
+
+                    <!-- New: Installment Planning -->
+                    <div class="installment-planning">
+                        <div class="section-divider">
+                            <span>Atau Simulasi Cicilan</span>
+                        </div>
+                        <div class="input-grid">
+                            <div class="input-group">
+                                <label for="installmentFrequency">Frekuensi Cicilan</label>
+                                <select id="installmentFrequency">
+                                    <option value="Harian">Harian</option>
+                                    <option value="Mingguan">Mingguan</option>
+                                    <option value="Bulanan">Bulanan</option>
+                                </select>
+                            </div>
+                            <div class="input-group">
+                                <label for="affordableAmount">Jumlah Per Cicilan (Rp)</label>
+                                <input type="number" id="affordableAmount" placeholder="Contoh: 500000">
+                            </div>
+                            <!-- New: Reminder Schedule -->
+                            <div class="input-group full-width" style="grid-column: span 2; margin-top: 10px;">
+                                <label for="reminderSchedule">Jadwal Pengingat Menabung</label>
+                                <select id="reminderSchedule">
+                                    <option value="None">Tidak Ada Pengingat</option>
+                                    <option value="Daily">Setiap Hari</option>
+                                    <option value="Weekly">Setiap Minggu</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- New: Savings Calendar Checklist (Buku Tabungan Cerdas) -->
+                    <div id="savingsCalendarContainer" class="savings-calendar-section hidden">
+                        <div class="calendar-header">
+                            <h4 id="calendarGoalTitle">Target Nabung</h4>
+                            <div class="calendar-sub">
+                                <span id="calendarGoalName">Tujuan: -</span>
+                                <strong id="calendarGoalAmount">Rp 0</strong>
+                            </div>
+                        </div>
+
+                        <div class="calendar-progress-wrapper">
+                            <div class="calendar-progress-bar">
+                                <div id="calendarProgressFill" class="calendar-progress-fill"></div>
+                            </div>
+                            <div class="calendar-progress-text">
+                                <span id="calendarPercent">0%</span>
+                                <span id="calendarStatusText">Belum set target</span>
+                            </div>
+                        </div>
+
+                        <div class="buku-tabungan-card">
+                            <div class="buku-header">
+                                <h5>Buku Tabungan Cerdas</h5>
+                            </div>
+                            <div class="buku-stats">
+                                <div class="buku-stat-item">
+                                    <span>Target Total</span>
+                                    <strong id="bukuTotalTarget">Rp 0</strong>
+                                </div>
+                                <div class="buku-stat-item">
+                                    <span>Wajib Nabung/Hari</span>
+                                    <strong id="bukuDailyAmount" class="text-blue-light">Rp 0</strong>
+                                </div>
+                            </div>
+
+                            <div class="buku-meta">
+                                <div class="progress-simple">
+                                    <div id="bukuProgressFill" class="progress-inner"></div>
+                                </div>
+                                <div class="meta-text">
+                                    <span id="bukuPercentSmall">0.0%</span>
+                                    <span id="bukuDaysLeft">0 Hari Tersisa (Belum Nabung)</span>
+                                </div>
+                            </div>
+
+                            <div class="buku-table-header">
+                                <span class="col-tgl">TGL</span>
+                                <span class="col-setor">SETOR (RP)</span>
+                                <span class="col-status">STATUS</span>
+                            </div>
+                            <div id="savingsChecklist" class="savings-checklist-modern">
+                                <!-- Populated by JS -->
+                            </div>
+                            <div class="checklist-footer">
+                                <button id="toggleChecklistBtn" class="ghost-btn-sm center">Lihat Semua Progres
+                                    ↓</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Real-time Daily Savings Preview -->
+                    <div id="dailySavingsPreview" class="realtime-preview hidden">
+                        <div class="preview-card">
+                            <span class="preview-label">Estimasi Tabungan Harian:</span>
+                            <strong id="previewAmount">Rp 0</strong>
+                            <p class="preview-hint">Dihitung berdasarkan sisa hari dari hari ini.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="actions space-between">
+                    <button id="backToStep1" class="ghost-btn">Kembali</button>
+                    <button id="toStep3" class="primary-btn">Lanjut: Catat Pengeluaran</button>
+                </div>
+            </section>
+
+            <!-- Step 3: Expenses Table -->
+            <section id="step-3" class="form-step">
+                <div class="card">
+                    <h3>Daftar Pengeluaran</h3>
+                    <div class="table-container">
+                        <table id="expensesTable">
+                            <thead>
+                                <tr>
+                                    <th>Tanggal</th>
+                                    <th>Jenis</th>
+                                    <th>Jumlah (Rp)</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="expensesBody">
+                                <!-- Dynamic rows will be added here -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <button id="addItemBtn" class="secondary-btn">+ Tambah Baris</button>
+                </div>
+                <div class="actions space-between">
+                    <button id="backToStep2" class="ghost-btn">Kembali</button>
+                    <button id="calculateBtn" class="primary-btn">Lihat Hasil Simulasi</button>
+                </div>
+            </section>
+
+            <!-- Step 4: Detailed Results -->
+            <section id="step-4" class="form-step">
+                <div class="result-card">
+                    <h3>Ringkasan Simulasi</h3>
+
+                    <!-- Overspending Alert (Hidden by default) -->
+                    <div id="overspendingAlert" class="overspending-alert hidden">
+                        <div class="alert-icon">⚠️</div>
+                        <div class="alert-content">
+                            <strong>Aduh, kamu boros!</strong>
+                            <p id="overspendingMessage"></p>
+                        </div>
+                    </div>
+
+                    <div id="expenseBreakdown" class="expense-breakdown">
+                        <!-- Items will be listed here -->
+                    </div>
+
+                    <div class="result-divider"></div>
+
+                    <div class="final-stats">
+                        <div class="stat-item">
+                            <span>Total Pengeluaran:</span>
+                            <strong id="totalExpenseDisplay">Rp 0</strong>
+                        </div>
+                        <div class="stat-item">
+                            <span>Sisa Uang:</span>
+                            <strong id="balanceDisplay">Rp 0</strong>
+                        </div>
+                    </div>
+
+                    <div id="savingsResult" class="savings-card hidden">
+                        <div class="savings-header">
+                            <h4 id="savingsGoalTitle">Progres Tabungan</h4>
+                            <span id="countdownDisplay" class="countdown-badge"></span>
+                        </div>
+
+                        <div id="dailySavingsInfo" class="daily-savings-badge hidden">
+                            <span>Target harian:</span>
+                            <strong id="dailySavingsAmount">Rp 0</strong>
+                        </div>
+                        <div id="installmentPlanInfo" class="installment-plan-badge hidden">
+                            <span id="installmentPlanLabel">Cicilan:</span>
+                            <strong id="installmentPlanAmount">Rp 0</strong>
+                        </div>
+                        <div class="savings-info">
+                            <div class="info-item">
+                                <span>Terkumpul:</span>
+                                <strong id="collectedAmount" class="text-green">Rp 0</strong>
+                            </div>
+                            <div class="info-item">
+                                <span>Kekurangan:</span>
+                                <strong id="remainingTarget" class="text-blue">Rp 0</strong>
+                            </div>
+                        </div>
+                        <div class="progress-bar-container">
+                            <div id="savingsProgress" class="progress-bar"></div>
+                        </div>
+                        <p id="savingsFeedback" class="savings-quote"></p>
+                    </div>
+
+                    <div id="insightReport" class="insight-card hidden">
+                        <div class="insight-icon">💡</div>
+                        <div class="insight-content">
+                            <h5 id="insightTitle">Pengeluaran Terbesar</h5>
+                            <p id="topExpenseMessage"></p>
+                        </div>
+                    </div>
+
+                    <div class="status-container">
+                        <div id="statusBadge" class="status-badge">Aman</div>
+                        <p id="statusMessage" class="status-message"></p>
+                    </div>
+                </div>
+
+                <div class="actions space-between">
+                    <button id="backToStep3" class="ghost-btn">Kembali</button>
+                    <div class="right-actions">
+                        <button id="toStep5" class="primary-btn">Lihat Analisis Grafik</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 5: Visual Analysis Screen -->
+            <section id="step-5" class="form-step">
+                <div class="visual-analysis-section">
+                    <div class="analysis-grid">
+                        <div class="card analysis-card">
+                            <h3>Perbandingan Dana</h3>
+                            <div class="chart-container">
+                                <canvas id="incomeVsExpenseChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="card analysis-card">
+                            <h3>Beban Kategori</h3>
+                            <div class="chart-container">
+                                <canvas id="categoryPieChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="card analysis-card full-width">
+                            <h3>Evolusi Tabungan</h3>
+                            <div class="chart-container">
+                                <canvas id="savingsProgressChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="actions space-between">
+                    <button id="backToStep4" class="ghost-btn">Kembali ke Ringkasan</button>
+                    <button id="resetBtn" class="danger-btn">Ulangi Dari Awal</button>
+                </div>
+            </section>
+        </main>
+    </div> <!-- End Dashboard -->
+    <footer>
+        <p>&copy; 2026 Simulasi Keuangan Pribadi - Rencanakan Keuangan Anda dengan Cerdas</p>
+    </footer>
+    <div id="toastContainer" class="toast-container"></div>
+    <script src="script.js"></script>
+</body>
+
+</html>
